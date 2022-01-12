@@ -108,6 +108,13 @@ const LargeFont = styled.p<{ inline?: boolean }>`
   font-weight: 600;
 `;
 
+const MediumFont = styled.p<{ inline?: boolean }>`
+  display: inline-block;
+  font-size: 16px;
+  color: grey;
+  font-weight: 600;
+`;
+
 const Spacer = styled.div`
   margin-bottom: 20px;
 `;
@@ -142,10 +149,14 @@ const Home: NextPage = () => {
 
   const daysToCompleteShow = selectedShow.number_of_episodes / episode;
 
-  const minutesOfShow =
-    selectedShow &&
-    selectedShow.episode_run_time &&
-    selectedShow.episode_run_time[0] * episode;
+  function timeConvert(n: number) {
+    const num = n;
+    const hours = num / 60;
+    const rhours = Math.floor(hours);
+    const minutes = (hours - rhours) * 60;
+    const rminutes = Math.round(minutes);
+    return rhours + " hour(s) and " + rminutes + " minute(s)";
+  }
 
   return (
     <Layout>
@@ -197,9 +208,11 @@ const Home: NextPage = () => {
               It will take you {Math.round(daysToCompleteShow)} days to finish
               this show{" "}
             </LargeFont>
-            <LargeFont>
-              {episode} episodes will be take {minutesOfShow} mins per day...
-            </LargeFont>
+            <MediumFont>
+              {episode} episodes will take{" "}
+              {timeConvert(selectedShow.episode_run_time[0] * episode)} per
+              day...
+            </MediumFont>
           </Card>
         ) : (
           <TypeAheadWrapper>
