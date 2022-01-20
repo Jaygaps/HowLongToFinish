@@ -2,6 +2,7 @@ import React from "react";
 import {
   ThemeProvider as StyledThemeProvider,
   createGlobalStyle,
+  
 } from "styled-components";
 
 import styledTheme from "./base/theme";

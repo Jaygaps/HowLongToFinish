@@ -15,9 +15,13 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
-const Title = styled.h2`
-  margin: 20px 0 60px 0; ;
+const Header = styled.div`
+  margin: 20px 0 60px 0;
+  display: flex;
+  justify-content: space-between;
 `;
+
+const Title = styled.h2``;
 
 const FlexWrapper = styled.div`
   displat: flex;
@@ -83,14 +87,18 @@ const TypeAheadCard = styled.div`
 `;
 
 const Card = styled.div<{ imageSrc: string }>`
-  ${({ theme: { colors }, imageSrc }) => css`
+  ${({ theme: { colors, media }, imageSrc }) => css`
     background-color: ${colors.primary};
     box-shadow: 0 3px 6px rgb(0 0 0 / 16%), 0 3px 6px rgb(0 0 0 / 23%);
     padding: 30px;
     border-bottom: 1px solid white;
     margin-top: 20px;
 
-    background-image: url(${imageSrc});
+    background-image: none;
+
+    ${media.up("tablet")} {
+      background-image: url(${imageSrc});
+    }
     background-position: right;
     background-size: contain;
     background-repeat: no-repeat;
@@ -119,6 +127,22 @@ const Spacer = styled.div`
   margin-bottom: 20px;
 `;
 
+const MobileImage = styled.img`
+  width: 100%;
+  margin-top: 24px;
+  border-radius: 13px;
+
+  ${({ theme: { media } }) => css`
+    ${media.up("tablet")} {
+      display: none;
+    }
+  `};
+`;
+
+const Dev = styled.p`
+  color: grey;
+`;
+
 const Home: NextPage = () => {
   const [episode, setEpisode] = useState(1);
   const [showName, setShowName] = useState("");
@@ -143,8 +167,6 @@ const Home: NextPage = () => {
       .then((result) => setSelectedShow(result.data));
   };
 
-  console.log(selectedShow);
-
   const imgSrc = `https://image.tmdb.org/t/p/w500${selectedShow.backdrop_path}`;
 
   const daysToCompleteShow = selectedShow.number_of_episodes / episode;
@@ -161,7 +183,11 @@ const Home: NextPage = () => {
   return (
     <Layout>
       <Container>
-        <Title>How Long To Finish</Title>
+        <Header>
+          <Title>How Long To Finish</Title>
+          <Dev>Dev by JayGaps</Dev>
+        </Header>
+
         <FlexWrapper>
           <Paragraph>I will be watching</Paragraph>
           <EpisodeInput
@@ -189,31 +215,34 @@ const Home: NextPage = () => {
           </SmallParagraph>
         ) : null}
         {selectedShow && selectedShow.name ? (
-          <Card imageSrc={imgSrc}>
-            <Paragraph>{selectedShow.name}</Paragraph>
-            <Span>
-              Number of episodes:{" "}
-              <LargeFont>{selectedShow.number_of_episodes}</LargeFont>
-            </Span>
-            <Span>
-              Number of seasons:{" "}
-              <LargeFont>{selectedShow.number_of_seasons}</LargeFont>
-            </Span>
-            <Span>
-              Episode run time:{" "}
-              <LargeFont>{selectedShow.episode_run_time[0]} mins</LargeFont>
-            </Span>
-            <Spacer />
-            <LargeFont inline>
-              It will take you {Math.round(daysToCompleteShow)} days to finish
-              this show{" "}
-            </LargeFont>
-            <MediumFont>
-              {episode} episodes will take{" "}
-              {timeConvert(selectedShow.episode_run_time[0] * episode)} per
-              day...
-            </MediumFont>
-          </Card>
+          <>
+            <MobileImage src={imgSrc} />
+            <Card imageSrc={imgSrc}>
+              <Paragraph>{selectedShow.name}</Paragraph>
+              <Span>
+                Number of episodes:{" "}
+                <LargeFont>{selectedShow.number_of_episodes}</LargeFont>
+              </Span>
+              <Span>
+                Number of seasons:{" "}
+                <LargeFont>{selectedShow.number_of_seasons}</LargeFont>
+              </Span>
+              <Span>
+                Episode run time:{" "}
+                <LargeFont>{selectedShow.episode_run_time[0]} mins</LargeFont>
+              </Span>
+              <Spacer />
+              <LargeFont inline>
+                It will take you {Math.round(daysToCompleteShow)} days to finish
+                this show{" "}
+              </LargeFont>
+              <MediumFont>
+                {episode} episodes will take{" "}
+                {timeConvert(selectedShow.episode_run_time[0] * episode)} per
+                day...
+              </MediumFont>
+            </Card>
+          </>
         ) : (
           <TypeAheadWrapper>
             {typeAheadShows && typeAheadShows !== undefined
