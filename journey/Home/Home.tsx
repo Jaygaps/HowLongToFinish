@@ -208,7 +208,7 @@ const CardContent = styled.div`
 `;
 
 const Home: NextPage = () => {
-  const [episode, setEpisode] = useState(1);
+  const [episode, setEpisode] = useState<any>(1);
   const [showName, setShowName] = useState("");
   const [typeAheadShows, setTypeAheadShows] = useState([]);
   const [selectedShow, setSelectedShow] = useState<any>({});
