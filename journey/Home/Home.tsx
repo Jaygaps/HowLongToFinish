@@ -282,7 +282,7 @@ const Home: NextPage = () => {
               setTypeAheadShows([]);
             }}
           >
-            How Long To Binge
+            How Long To Finish
           </Title>
           <div>
             <Link
