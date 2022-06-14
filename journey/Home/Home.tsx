@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import { useState } from "react";
 import styled, { css } from "styled-components";
 import axios from "axios";
+import { motion, AnimateSharedLayout } from "framer-motion";
 
 import Layout from "../../components/Layout";
 import Link from "next/link";
@@ -29,7 +30,9 @@ const Header = styled.div`
   `};
 `;
 
-const Title = styled.h2``;
+const Title = styled.h2`
+  cursor: pointer;
+`;
 
 const FlexWrapper = styled.div`
   displat: flex;
@@ -82,10 +85,10 @@ const MainInput = styled.input`
 const TypeAheadWrapper = styled.div`
   ${({ theme: { media } }) => css`
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
 
     ${media.up("tablet")} {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr 1fr;
     }
 
     ${media.up("desktop")} {
@@ -95,12 +98,13 @@ const TypeAheadWrapper = styled.div`
   gap: 20px;
 `;
 
-const TypeAheadCard = styled.div`
+const TypeAheadCard = styled(motion.div)`
   background-color: ${({ theme: { colors } }) => colors.primary};
   box-shadow: 0 3px 6px rgb(0 0 0 / 16%), 0 3px 6px rgb(0 0 0 / 23%);
   border-radius: 20px;
   position: relative;
-
+  display: flex;
+  flex-direction: column;
   border: 1px solid #222;
 
   > img {
@@ -168,10 +172,11 @@ const MobileImage = styled.img`
   `};
 `;
 
-const Dev = styled.p`
+const Dev = styled.a`
   color: grey;
   text-decoration: underline;
   cursor: pointer;
+  display: block;
 
   &:hover {
     color: #f8f8f8;
@@ -189,6 +194,11 @@ const Popularity = styled.div`
   box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px,
     rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px,
     rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  text-align: center;
+  > span {
+    font-weight: 300;
+    font-size: 12px;
+  }
 `;
 
 const PlaceholderImage = styled.div`
@@ -205,6 +215,16 @@ const PlaceholderImage = styled.div`
 
 const CardContent = styled.div`
   padding: 16px;
+  flex: 1;
+`;
+
+const Button = styled.div`
+  margin: 16px;
+  background-color: white;
+  padding: 7px;
+  border-radius: 15px;
+  text-align: center;
+  color: black;
 `;
 
 const Home: NextPage = () => {
@@ -255,10 +275,21 @@ const Home: NextPage = () => {
     <Layout>
       <Container>
         <Header>
-          <Title>How Long To Binge</Title>
+          <Title
+            onClick={() => {
+              setShowName("");
+              setSelectedShow({});
+              setTypeAheadShows([]);
+            }}
+          >
+            How Long To Binge
+          </Title>
           <div>
-            <Link href="https://www.linkedin.com/in/jayraj-surti-b736bb138/">
-              <Dev>Dev by JayGaps</Dev>
+            <Link
+              href="https://www.linkedin.com/in/jayraj-surti-b736bb138/"
+              passHref
+            >
+              <Dev target="_blank">Dev by JayGaps</Dev>
             </Link>
             <label>ZINC Development</label>
           </div>
@@ -279,19 +310,22 @@ const Home: NextPage = () => {
           value={showName}
           onChange={(e) => handleOnChangeShow(e)}
         />
-        {showName && showName.length ? (
-          <SmallParagraph
-            onClick={() => {
-              setShowName("");
-              setTypeAheadShows([]);
-              setSelectedShow({});
-            }}
-          >
-            Clear
-          </SmallParagraph>
-        ) : null}
+
+        <SmallParagraph
+          onClick={() => {
+            setShowName("");
+            setTypeAheadShows([]);
+            setSelectedShow({});
+          }}
+        >
+          Clear
+        </SmallParagraph>
+
         {selectedShow && selectedShow.name ? (
-          <>
+          <motion.div
+            initial={{ y: -40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+          >
             <MobileImage src={imgSrc} />
             <Card imageSrc={imgSrc}>
               <Paragraph>{selectedShow.name}</Paragraph>
@@ -309,8 +343,8 @@ const Home: NextPage = () => {
               </Span>
               <Spacer />
               <LargeFont inline>
-                It will take you {Math.round(daysToCompleteShow)} days to finish
-                this show{" "}
+                It will take you {Math.round(daysToCompleteShow)} day(s) to
+                finish this show{" "}
               </LargeFont>
               <MediumFont>
                 {episode} episodes will take{" "}
@@ -318,35 +352,43 @@ const Home: NextPage = () => {
                 day...
               </MediumFont>
             </Card>
-          </>
+          </motion.div>
         ) : (
           <TypeAheadWrapper>
-            {typeAheadShows && typeAheadShows !== undefined
-              ? typeAheadShows.map((show: any, index) => (
-                  <TypeAheadCard
-                    key={index}
-                    onClick={() => handleSelectedShow(show.id)}
-                  >
-                    <Popularity>{show.vote_average * 10}%</Popularity>
-                    {show.poster_path ? (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w500${show.poster_path}`}
-                        width="100%"
-                      />
-                    ) : show.backdrop_path ? (
-                      <img
-                        width="100%"
-                        src={`https://image.tmdb.org/t/p/w500${show.backdrop_path}`}
-                      />
-                    ) : (
-                      <PlaceholderImage>No image</PlaceholderImage>
-                    )}
-                    <CardContent>
-                      <h3>{show.name}</h3>
-                    </CardContent>
-                  </TypeAheadCard>
-                ))
-              : null}
+            <AnimateSharedLayout>
+              {typeAheadShows && typeAheadShows !== undefined
+                ? typeAheadShows.map((show: any, index) => (
+                    <TypeAheadCard
+                      initial={{ y: -40, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: index * 0.2, duration: 1 }}
+                      key={index}
+                      onClick={() => handleSelectedShow(show.id)}
+                    >
+                      <Popularity>
+                        {show.vote_average * 10}% <br /> <span>popularity</span>
+                      </Popularity>
+                      {show.poster_path ? (
+                        <img
+                          src={`https://image.tmdb.org/t/p/w500${show.poster_path}`}
+                          width="100%"
+                        />
+                      ) : show.backdrop_path ? (
+                        <img
+                          width="100%"
+                          src={`https://image.tmdb.org/t/p/w500${show.backdrop_path}`}
+                        />
+                      ) : (
+                        <PlaceholderImage>No image</PlaceholderImage>
+                      )}
+                      <CardContent>
+                        <h3>{show.name}</h3>
+                      </CardContent>
+                      <Button>click for more information</Button>
+                    </TypeAheadCard>
+                  ))
+                : null}
+            </AnimateSharedLayout>
           </TypeAheadWrapper>
         )}
       </Container>
